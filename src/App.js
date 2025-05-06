@@ -4,20 +4,48 @@ import './App.css';
 
 function App() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    tos: '',
+    fiebre: '',
+    cefalea: '',
+    congestion_nasal: '',
+    dificultad_respiratoria: '',
+    dolor_garganta: '',
+    dolor_pecho: '',
+    diarrea: '',
+    nauseas: '',
+    dolor_abdominal: '',
+    anosmia_hiposmia: '',
+    dolor_articulaciones: '',
+    dolor_muscular: '',
+  });
 
-  // Manejar cambios en los inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: parseInt(value) }));
+    setFormData((prev) => {
+      const newData = { ...prev, [name]: value };
+      console.log('formData:', newData);
+      return newData;
+    });
   };
 
-  // Avanzar al siguiente paso
   const nextStep = () => {
+    if (step === 5) {
+      const requiredFields = [
+        'tos', 'fiebre', 'cefalea', 'congestion_nasal',
+        'dificultad_respiratoria', 'dolor_garganta', 'dolor_pecho',
+        'diarrea', 'nauseas', 'dolor_abdominal',
+        'anosmia_hiposmia', 'dolor_articulaciones', 'dolor_muscular'
+      ];
+      const missingFields = requiredFields.filter(field => !formData[field]);
+      if (missingFields.length > 0) {
+        alert(`Por favor, completa todos los campos. Faltan: ${missingFields.join(', ')}`);
+        return;
+      }
+    }
     setStep((prev) => prev + 1);
   };
 
-  // Retroceder al paso anterior
   const prevStep = () => {
     setStep((prev) => prev - 1);
   };
@@ -26,7 +54,6 @@ function App() {
     <div className="App">
       <h1>Evaluación de Síntomas Pulmonares</h1>
       <div className="form-container">
-        {/* Paso 1: Introducción */}
         {step === 1 && (
           <div id="step-1" className="step-block">
             <h3>👋 Bienvenido</h3>
@@ -39,15 +66,13 @@ function App() {
             </button>
           </div>
         )}
-
-        {/* Paso 2: Síntomas Generales */}
         {step === 2 && (
           <div id="step-2" className="step-block">
             <h3>🤒 Síntomas Generales</h3>
             <div className="form-grid">
               <div className="form-group">
                 <label>¿Tienes tos?</label>
-                <select name="tos" onChange={handleInputChange} value={formData.tos || ''}>
+                <select name="tos" onChange={handleInputChange} value={formData.tos}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -55,7 +80,7 @@ function App() {
               </div>
               <div className="form-group">
                 <label>¿Tienes fiebre?</label>
-                <select name="fiebre" onChange={handleInputChange} value={formData.fiebre || ''}>
+                <select name="fiebre" onChange={handleInputChange} value={formData.fiebre}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -63,7 +88,7 @@ function App() {
               </div>
               <div className="form-group">
                 <label>¿Tienes cefalea (dolor de cabeza)?</label>
-                <select name="cefalea" onChange={handleInputChange} value={formData.cefalea || ''}>
+                <select name="cefalea" onChange={handleInputChange} value={formData.cefalea}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -71,7 +96,7 @@ function App() {
               </div>
               <div className="form-group">
                 <label>¿Tienes congestión nasal?</label>
-                <select name="congestion_nasal" onChange={handleInputChange} value={formData.congestion_nasal || ''}>
+                <select name="congestion_nasal" onChange={handleInputChange} value={formData.congestion_nasal}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -88,15 +113,13 @@ function App() {
             </div>
           </div>
         )}
-
-        {/* Paso 3: Síntomas Respiratorios */}
         {step === 3 && (
           <div id="step-3" className="step-block">
             <h3>😮‍💨 Síntomas Respiratorios</h3>
             <div className="form-grid">
               <div className="form-group">
                 <label>¿Tienes dificultad respiratoria?</label>
-                <select name="dificultad_respiratoria" onChange={handleInputChange} value={formData.dificultad_respiratoria || ''}>
+                <select name="dificultad_respiratoria" onChange={handleInputChange} value={formData.dificultad_respiratoria}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -104,7 +127,7 @@ function App() {
               </div>
               <div className="form-group">
                 <label>¿Tienes dolor de garganta?</label>
-                <select name="dolor_garganta" onChange={handleInputChange} value={formData.dolor_garganta || ''}>
+                <select name="dolor_garganta" onChange={handleInputChange} value={formData.dolor_garganta}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -112,7 +135,7 @@ function App() {
               </div>
               <div className="form-group">
                 <label>¿Tienes dolor en el pecho?</label>
-                <select name="dolor_pecho" onChange={handleInputChange} value={formData.dolor_pecho || ''}>
+                <select name="dolor_pecho" onChange={handleInputChange} value={formData.dolor_pecho}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -129,15 +152,13 @@ function App() {
             </div>
           </div>
         )}
-
-        {/* Paso 4: Síntomas Digestivos */}
         {step === 4 && (
           <div id="step-4" className="step-block">
             <h3>🤢 Síntomas Digestivos</h3>
             <div className="form-grid">
               <div className="form-group">
                 <label>¿Tienes diarrea?</label>
-                <select name="diarrea" onChange={handleInputChange} value={formData.diarrea || ''}>
+                <select name="diarrea" onChange={handleInputChange} value={formData.diarrea}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -145,7 +166,7 @@ function App() {
               </div>
               <div className="form-group">
                 <label>¿Tienes náuseas?</label>
-                <select name="nauseas" onChange={handleInputChange} value={formData.nauseas || ''}>
+                <select name="nauseas" onChange={handleInputChange} value={formData.nauseas}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -153,7 +174,7 @@ function App() {
               </div>
               <div className="form-group">
                 <label>¿Tienes dolor abdominal?</label>
-                <select name="dolor_abdominal" onChange={handleInputChange} value={formData.dolor_abdominal || ''}>
+                <select name="dolor_abdominal" onChange={handleInputChange} value={formData.dolor_abdominal}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -170,15 +191,13 @@ function App() {
             </div>
           </div>
         )}
-
-        {/* Paso 5: Síntomas Neurológicos y Musculares */}
         {step === 5 && (
           <div id="step-5" className="step-block">
             <h3>🧠 Síntomas Neurológicos y Musculares</h3>
             <div className="form-grid">
               <div className="form-group">
                 <label>¿Tienes anosmia o hiposmia (pérdida de olfato)?</label>
-                <select name="anosmia_hiposmia" onChange={handleInputChange} value={formData.anosmia_hiposmia || ''}>
+                <select name="anosmia_hiposmia" onChange={handleInputChange} value={formData.anosmia_hiposmia}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -186,7 +205,7 @@ function App() {
               </div>
               <div className="form-group">
                 <label>¿Tienes dolor en articulaciones?</label>
-                <select name="dolor_articulaciones" onChange={handleInputChange} value={formData.dolor_articulaciones || ''}>
+                <select name="dolor_articulaciones" onChange={handleInputChange} value={formData.dolor_articulaciones}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -194,7 +213,7 @@ function App() {
               </div>
               <div className="form-group">
                 <label>¿Tienes dolor muscular?</label>
-                <select name="dolor_muscular" onChange={handleInputChange} value={formData.dolor_muscular || ''}>
+                <select name="dolor_muscular" onChange={handleInputChange} value={formData.dolor_muscular}>
                   <option value="">Selecciona</option>
                   <option value="1">Sí</option>
                   <option value="0">No</option>
@@ -211,8 +230,6 @@ function App() {
             </div>
           </div>
         )}
-
-        {/* Paso 6: Resultado */}
         {step === 6 && (
           <ResultStep formData={formData} />
         )}

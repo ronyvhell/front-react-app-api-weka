@@ -1,42 +1,64 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import './ResultStep.css';
 
 function ResultStep({ formData }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const symptoms = {
-      tos: formData.tos || 0,
-      cefalea: formData.cefalea || 0,
-      congestion_nasal: formData.congestion_nasal || 0,
-      dificultad_respiratoria: formData.dificultad_respiratoria || 0,
-      dolor_garganta: formData.dolor_garganta || 0,
-      fiebre: formData.fiebre || 0,
-      diarrea: formData.diarrea || 0,
-      nauseas: formData.nauseas || 0,
-      anosmia_hiposmia: formData.anosmia_hiposmia || 0,
-      dolor_abdominal: formData.dolor_abdominal || 0,
-      dolor_articulaciones: formData.dolor_articulaciones || 0,
-      dolor_muscular: formData.dolor_muscular || 0,
-      dolor_pecho: formData.dolor_pecho || 0,
+    const fetchResult = async () => {
+      setLoading(true);
+      try {
+        const requiredFields = [
+          'tos', 'fiebre', 'cefalea', 'congestion_nasal',
+          'dificultad_respiratoria', 'dolor_garganta', 'dolor_pecho',
+          'diarrea', 'nauseas', 'dolor_abdominal',
+          'anosmia_hiposmia', 'dolor_articulaciones', 'dolor_muscular'
+        ];
+
+        const symptoms = {};
+        for (const field of requiredFields) {
+          if (!formData[field] || (formData[field] !== '0' && formData[field] !== '1')) {
+            throw new Error(`Campo incompleto o inválido: ${field}`);
+          }
+          symptoms[field] = parseInt(formData[field]);
+        }
+
+        console.log('formData recibido:', formData);
+        console.log('Datos enviados al backend:', symptoms);
+
+        const response = await fetch('http://localhost:5000/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(symptoms),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Error en la solicitud');
+        }
+
+        setResult(data);
+        setError(null);
+      } catch (err) {
+        setError(err.message || 'Error al conectar con el servidor');
+        setResult(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetch('http://localhost:5000/predict', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(symptoms),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setResult(data);
-        }
-      })
-      .catch((err) => setError('Error al conectar con el servidor'));
+    fetchResult();
   }, [formData]);
+
+  const getTimestamp = () => {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const handleVolver = () => {
+    window.location.reload();
+  };
 
   return (
     <div id="step-6" className="step-block">
@@ -46,27 +68,41 @@ function ResultStep({ formData }) {
           <div className="chat-bubble">
             <p>Hola, gracias por completar la evaluación médica.</p>
           </div>
-          <span className="chat-timestamp">{new Date().toLocaleTimeString()}</span>
+          <span className="chat-timestamp">{getTimestamp()}</span>
         </div>
-        {error && (
+        {loading && (
           <div className="chat-message ai-message">
             <div className="chat-bubble">
-              <p>Error: {error}</p>
+              <p><strong>Procesando...</strong></p>
             </div>
-            <span className="chat-timestamp">{new Date().toLocaleTimeString()}</span>
+            <span className="chat-timestamp">{getTimestamp()}</span>
+          </div>
+        )}
+        {error && (
+          <div className="chat-message ai-message error">
+            <div className="chat-bubble">
+              <p><strong>Error:</strong> {error}</p>
+            </div>
+            <span className="chat-timestamp">{getTimestamp()}</span>
           </div>
         )}
         {result && (
           <div className="chat-message ai-message">
             <div className="chat-bubble">
               <p>
-                <strong>Probabilidad de COVID-19:</strong> {result.probability}%<br />
-                <strong>Recomendación:</strong> {result.recommendation}
+                <strong>Probabilidad de COVID-19:</strong> {result.probability}% <br />
+                <strong>Recomendación:</strong> {result.recommendation} <br />
+                <strong>Mensaje:</strong> {result.message}
               </p>
             </div>
-            <span className="chat-timestamp">{new Date().toLocaleTimeString()}</span>
+            <span className="chat-timestamp">{getTimestamp()}</span>
           </div>
         )}
+      </div>
+      <div className="button-group">
+        <button onClick={handleVolver} className="prev-button">
+          Volver
+        </button>
       </div>
     </div>
   );
