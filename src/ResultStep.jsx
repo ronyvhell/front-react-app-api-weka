@@ -5,6 +5,24 @@ function ResultStep({ formData }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [modelInfo, setModelInfo] = useState(null);
+
+  // Función para obtener información del modelo
+  useEffect(() => {
+    const fetchModelInfo = async () => {
+      try {
+        const response = await fetch('https://vc5nkgs5-5000.use2.devtunnels.ms/model-info');
+        if (response.ok) {
+          const data = await response.json();
+          setModelInfo(data);
+        }
+      } catch (err) {
+        console.error("Error al obtener información del modelo:", err);
+      }
+    };
+
+    fetchModelInfo();
+  }, []);
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -28,7 +46,7 @@ function ResultStep({ formData }) {
         console.log('formData recibido:', formData);
         console.log('Datos enviados al backend:', symptoms);
 
-        const response = await fetch('http://localhost:5000/predict', {
+        const response = await fetch('https://vc5nkgs5-5000.use2.devtunnels.ms/predict', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(symptoms),
@@ -63,6 +81,11 @@ function ResultStep({ formData }) {
   return (
     <div id="step-6" className="step-block">
       <h3>📊 Resultado del Análisis</h3>
+      {modelInfo && (
+        <div className="model-info">
+          <p>Precisión del modelo: <strong>{modelInfo.precision}%</strong></p>
+        </div>
+      )}
       <div className="chat-container">
         <div className="chat-message ai-message">
           <div className="chat-bubble">

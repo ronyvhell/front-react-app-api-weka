@@ -50,3 +50,18 @@
     padding: 10px 14px;
   }
 }
+
+
+/* Añadir al final del archivo */
+.model-info {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-left: 4px solid #ffa726;
+  font-size: 0.9rem;
+}
+
+.model-info strong {
+  color: #ffa726;
+}
